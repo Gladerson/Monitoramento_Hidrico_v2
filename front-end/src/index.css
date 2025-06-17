@@ -1,0 +1,65 @@
+/* src/index.css */
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  --primary-blue: #0d6efd;
+  --primary-blue-dark: #0a58ca;
+  --secondary-blue: #17a2b8;
+  --light-blue-bg: #f8f9fa;
+  --sidebar-bg: #004085;
+}
+
+body {
+  margin: 0;
+  min-width: 320px;
+  min-height: 100vh;
+  background-color: #eef2f5;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+#root::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -2;
+  
+  /* Caminho para sua imagem de fundo */
+  background-image: url('./images/gargalheiras.jpg');
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: #2193b0;
+  
+  /* Aplicação de transparência do background */
+
+  opacity: 0.4;
+}
+
+/* Estilos Globais para Botões e Links */
+.btn-primary {
+  background-color: var(--primary-blue);
+  border-color: var(--primary-blue);
+}
+.btn-primary:hover {
+  background-color: var(--primary-blue-dark);
+  border-color: var(--primary-blue-dark);
+}
+
+.nav-pills .nav-link.active, .nav-pills .show>.nav-link {
+  background-color: var(--primary-blue);
+}
