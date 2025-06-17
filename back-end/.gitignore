@@ -5,3 +5,6 @@ __pycache__/
 
 # Arquivos de Sistema
 .DS_Store
+
+# Autenticação
+.env
