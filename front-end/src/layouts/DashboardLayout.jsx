@@ -3,7 +3,9 @@ import React from 'react';
 import { Outlet, useNavigate, NavLink } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSessionTimer } from '../hooks/useSessionTimer';
-import { House, SignOut, MagnifyingGlass } from '@phosphor-icons/react';
+// CORREÇÃO: Substituído 'Droplet' por 'Drop'
+import { House, SignOut, MagnifyingGlass, Drop, Waves, Factory, Broadcast } from '@phosphor-icons/react';
+import logo from '../assets/WaterStatios.PNG'; // Importar o logo
 
 const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
@@ -25,13 +27,31 @@ const Sidebar = () => {
     return (
         <div className="d-flex flex-column flex-shrink-0 p-3 text-white" style={{ width: '280px', minHeight: '100vh', backgroundColor: 'var(--sidebar-bg)' }}>
             <a href="/dashboard" className="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
-                <span className="fs-4">SEMARH</span>
+                <img src={logo} alt="WaterStation Logo" style={{ height: '50px' }} />
             </a>
             <hr />
             <ul className="nav nav-pills flex-column mb-auto">
+                <li className="nav-item mb-2">
+                    <span className="nav-link text-white-50">Navegação</span>
+                    <NavLink to="/dashboard" end className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
+                        <House size={24} className="me-2" /> Início (Tudo)
+                    </NavLink>
+                </li>
+                
                 <li className="nav-item">
-                    <NavLink to="/dashboard" className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
-                        <House size={24} className="me-2" /> Início
+                    <span className="nav-link text-white-50">Filtros</span>
+                    <NavLink to="/dashboard?tipo=RESERVATORIO" className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
+                        <Waves size={24} className="me-2" /> Reservatórios
+                    </NavLink>
+                    <NavLink to="/dashboard?tipo=POCO" className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
+                        {/* CORREÇÃO: Usando o ícone 'Drop' correto */}
+                        <Drop size={24} className="me-2" /> Poços
+                    </NavLink>
+                    <NavLink to="/dashboard?tipo=DESSALINIZADOR" className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
+                        <Factory size={24} className="me-2" /> Dessalinizadores
+                    </NavLink>
+                    <NavLink to="/dashboard?tipo=REDE_DISTRIBUICAO" className={({ isActive }) => "nav-link text-white" + (isActive ? " active" : "")}>
+                        <Broadcast size={24} className="me-2" /> Rede de distribuição
                     </NavLink>
                 </li>
             </ul>
@@ -53,6 +73,7 @@ const Sidebar = () => {
         </div>
     );
 };
+
 
 const SearchBar = () => (
     <div className="input-group mb-4 shadow-sm">

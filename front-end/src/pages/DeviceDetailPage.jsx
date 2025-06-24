@@ -15,33 +15,39 @@ const MESES = [
 ];
 
 const DeviceDetailPage = () => {
-    const { mac } = useParams();
+    // CORREÇÃO: Usar 'macAddress' para corresponder à rota definida em App.jsx
+    const { macAddress } = useParams();
     const navigate = useNavigate();
     const [device, setDevice] = useState(null);
     const [stats, setStats] = useState({ monthly_consumption: [], daily_max_flow: [] });
     const [loading, setLoading] = useState(true);
+    const [loadingStats, setLoadingStats] = useState(true); // Estado de loading para os gráficos
     const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth() + 1);
     const [selectedYear] = useState(new Date().getFullYear());
 
     const fetchDetails = useCallback(() => {
-        api.get(`/dispositivos/${mac}/`)
+        if (!macAddress) return;
+        api.get(`/dispositivos/${macAddress}/`)
             .then(response => setDevice(response.data))
             .catch(error => console.error("Erro ao buscar detalhes do dispositivo:", error));
-    }, [mac]);
+    }, [macAddress]);
 
     const fetchStats = useCallback(() => {
-        setLoading(true);
-        api.get(`/dispositivos/${mac}/stats/?year=${selectedYear}&month=${selectedMonth}`)
+        if (!macAddress) return;
+        setLoadingStats(true);
+        api.get(`/dispositivos/${macAddress}/stats/?year=${selectedYear}&month=${selectedMonth}`)
             .then(response => {
                 setStats(response.data);
             })
             .catch(error => console.error("Erro ao buscar estatísticas:", error))
-            .finally(() => setLoading(false));
-    }, [mac, selectedYear, selectedMonth]);
+            .finally(() => setLoadingStats(false));
+    }, [macAddress, selectedYear, selectedMonth]);
 
     useEffect(() => {
+        setLoading(true);
         fetchDetails();
-        const intervalId = setInterval(fetchDetails, 5000);
+        setLoading(false);
+        const intervalId = setInterval(fetchDetails, 5000); // Atualiza os dados a cada 5 segundos
         return () => clearInterval(intervalId);
     }, [fetchDetails]);
 
@@ -49,6 +55,7 @@ const DeviceDetailPage = () => {
         fetchStats();
     }, [fetchStats]);
 
+    // O loading principal é apenas para o dispositivo. O loading dos gráficos é separado.
     if (!device) return <div className="text-center p-5">Carregando...</div>;
 
     const doughnutData = {
@@ -97,10 +104,10 @@ const DeviceDetailPage = () => {
             <div className="row">
                 <div className="col-lg-5 mb-4">
                     <div className="card p-3 h-100">
-                         <h5>Consumo no Ano ({selectedYear})</h5>
-                         <div style={{ position: 'relative', height: '300px' }}>
+                        <h5>Consumo no Ano ({selectedYear})</h5>
+                        <div style={{ position: 'relative', height: '300px' }}>
                             <Doughnut data={doughnutData} options={{ responsive: true, maintainAspectRatio: false }} />
-                         </div>
+                        </div>
                     </div>
                 </div>
                 <div className="col-lg-7 mb-4">
@@ -120,7 +127,7 @@ const DeviceDetailPage = () => {
                             </div>
                         </div>
                         <div style={{ position: 'relative', height: '250px', marginTop: '1rem' }}>
-                           {loading ? <p>Carregando gráfico...</p> : <Line data={lineData} options={{ responsive: true, maintainAspectRatio: false }} />}
+                           {loadingStats ? <p className="text-center">Carregando gráfico...</p> : <Line data={lineData} options={{ responsive: true, maintainAspectRatio: false }} />}
                         </div>
                     </div>
                 </div>

@@ -42,7 +42,8 @@ class UserOperatorViewSerializer(serializers.ModelSerializer):
 class RecursoHidricoSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecursoHidrico
-        fields = '__all__'
+        # Explicitamente adicionado o campo 'tipo'
+        fields = ['id', 'nome', 'endereco', 'tipo']
 
 class DispositivoCadastradoSerializer(serializers.ModelSerializer):
     class Meta:

@@ -1,6 +1,6 @@
 // src/pages/AddressListPage.jsx
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { MapPin, CaretRight } from '@phosphor-icons/react';
@@ -28,15 +28,26 @@ const AddressListPage = () => {
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
     const { user } = useAuth();
+    const [searchParams] = useSearchParams(); // Hook para ler os parâmetros da URL
 
     useEffect(() => {
         const fetchAddresses = () => {
-            api.get('/addresses/')
+            const tipo = searchParams.get('tipo'); // Pega o valor do parâmetro 'tipo'
+            
+            let url = '/addresses/';
+            if (tipo) {
+                // Adiciona o filtro na URL da requisição se o parâmetro existir
+                url += `?recursos_hidricos__tipo=${tipo}`;
+            }
+
+            setLoading(true); // Inicia o loading a cada nova busca
+            api.get(url)
                 .then(response => {
                     setAddresses(response.data);
                 })
                 .catch(error => {
                     console.error("Erro ao buscar endereços:", error);
+                    setAddresses([]); // Limpa os endereços em caso de erro
                 })
                 .finally(() => {
                     setLoading(false);
@@ -44,7 +55,7 @@ const AddressListPage = () => {
         };
 
         fetchAddresses();
-    }, []);
+    }, [searchParams]); // O useEffect será executado novamente sempre que os parâmetros da URL mudarem
 
     if (loading) {
         return <div className="text-center">Carregando locais de monitoramento...</div>;
@@ -67,6 +78,7 @@ const AddressListPage = () => {
                 </div>
             ) : (
                 <div className="text-center p-5 bg-light rounded">
+                    {/* Mensagem customizada conforme solicitado */}
                     <p>Nenhum local de monitoramento encontrado para este usuário.</p>
                 </div>
             )}

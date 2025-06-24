@@ -30,7 +30,7 @@ function LoginPage() {
                 maxWidth: '420px', 
                 backgroundColor: 'rgba(255, 255, 255, 0.9)' // Fundo branco semi-transparente
             }}>
-                <h3 className="card-title text-center mb-4">Monitoramento Hídrico</h3>
+                <h3 className="card-title text-center mb-4">WaterStation</h3>
                 <form onSubmit={handleLogin}>
                     <div className="mb-3">
                         <label htmlFor="emailInput" className="form-label">Email</label>

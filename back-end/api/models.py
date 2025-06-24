@@ -37,9 +37,22 @@ class Address(models.Model):
 
 # Modelo de Recursos Hídricos 
 class RecursoHidrico(models.Model):
+    # 1. Classe para as escolhas do novo campo 'tipo'
+    class TipoRecurso(models.TextChoices):
+        RESERVATORIO = "RESERVATORIO", "Reservatório"
+        POCO = "POCO", "Poço"
+        DESSALINIZADOR = "DESSALINIZADOR", "Dessalinizador"
+        REDE_DISTRIBUICAO = "REDE_DISTRIBUICAO", "Rede de distribuição"
+
     id = models.CharField(max_length=6, primary_key=True, default=generate_random_id, editable=False)
     nome = models.CharField(max_length=100)
     endereco = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='recursos_hidricos')
+    # 2. Adicionar o novo campo 'tipo'
+    tipo = models.CharField(
+        max_length=50, 
+        choices=TipoRecurso.choices, 
+        default=TipoRecurso.RESERVATORIO
+    )
     
     def __str__(self):
         return self.nome
