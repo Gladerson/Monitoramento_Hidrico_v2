@@ -1,6 +1,6 @@
 // src/pages/AddressDashboardPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import { MapPin, ArrowLeft, PlusCircle } from '@phosphor-icons/react';
 
@@ -22,6 +22,7 @@ const RecursoHidricoCard = ({ recurso }) => (
 // Componente principal da página
 const AddressDashboardPage = () => {
     const { id } = useParams(); // Pega o 'id' do endereço da URL
+    const navigate = useNavigate(); // Hook para navegação programática
     const [address, setAddress] = useState(null);
     const [recursos, setRecursos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -59,10 +60,10 @@ const AddressDashboardPage = () => {
         return (
             <div className="text-center alert alert-danger">
                 <p>{error}</p>
-                <Link to="/dashboard" className="btn btn-primary mt-3">
+                <button onClick={() => navigate('/dashboard')} className="btn btn-primary mt-3">
                     <ArrowLeft size={16} className="me-2" />
                     Voltar para o Início
-                </Link>
+                </button>
             </div>
         );
     }
@@ -83,17 +84,19 @@ const AddressDashboardPage = () => {
                         {`${address.rua}, ${address.numero}, ${address.bairro}, ${address.municipio} - ${address.estado}`}
                     </p>
                 </div>
-                <Link to="/dashboard" className="btn btn-secondary">
+                {/* BOTÃO VOLTAR PADRONIZADO */}
+                <button onClick={() => navigate(-1)} className="btn btn-sm btn-outline-secondary">
                     <ArrowLeft size={16} className="me-2" />
                     Voltar
-                </Link>
+                </button>
             </div>
 
             <hr />
 
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h2 className="h4">Recursos Hídricos</h2>
-                <button className="btn btn-primary">
+                {/* BOTÃO ADICIONAR RECURSO PADRONIZADO */}
+                <button className="btn btn-sm btn-primary">
                     <PlusCircle size={20} className="me-2" />
                     Adicionar Recurso
                 </button>
