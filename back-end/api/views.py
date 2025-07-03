@@ -45,33 +45,29 @@ class AddressViewSet(viewsets.ModelViewSet):
     serializer_class = AddressSerializer
     permission_classes = [permissions.IsAuthenticated]
     
-    # Adicionado filterset_fields para permitir a filtragem via URL
-    # A sintaxe 'recursos_hidricos__tipo' permite filtrar o Endereço
-    # pelo 'tipo' de seus Recursos Hídricos relacionados.
     filterset_fields = ['recursos_hidricos__tipo']
+    # Adicionado campo de busca textual
+    search_fields = ['rua', 'bairro', 'municipio', 'estado']
 
-    # ======================================================================
-    # MÉTODO get_queryset CORRIGIDO E OTIMIZADO PARA FILTRAGEM
-    # ======================================================================
     def get_queryset(self):
         user = self.request.user
-        base_queryset = Address.objects.distinct() # Usar distinct para evitar duplicatas
+        base_queryset = Address.objects.distinct() 
 
         if not user.is_authenticated:
             return base_queryset.none()
 
         if user.role in ['ADMIN', 'OPERATOR']:
-            # Admins e Operadores podem ver todos, mas ainda podem filtrar
             return base_queryset
         
-        # Usuários comuns só podem ver seus próprios endereços
         return base_queryset.filter(proprietario=user)
 
 
 class RecursoHidricoViewSet(viewsets.ModelViewSet):
     queryset = RecursoHidrico.objects.all()
     serializer_class = RecursoHidricoSerializer
-    filterset_fields = ['endereco', 'tipo'] # Adicionado 'tipo' à filtragem
+    filterset_fields = ['endereco', 'tipo']
+    # Adicionado campo de busca textual
+    search_fields = ['nome']
     
     def get_permissions(self):
         if self.action == 'destroy':
@@ -85,6 +81,8 @@ class DispositivoCadastradoViewSet(viewsets.ModelViewSet):
     serializer_class = DispositivoCadastradoSerializer
     lookup_field = 'mac_address'
     filterset_fields = ['local']
+    # Adicionado campo de busca textual
+    search_fields = ['nome_dispositivo', 'mac_address']
 
     @action(detail=True, methods=['post'], url_path='leitura')
     def salvar_leitura(self, request, mac_address=None):

@@ -1,10 +1,9 @@
 // src/pages/AddressDashboardPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { MapPin, ArrowLeft, PlusCircle } from '@phosphor-icons/react';
 
-// Componente para o card de Recurso Hídrico
 const RecursoHidricoCard = ({ recurso }) => (
     <div className="col">
         <div className="card shadow-sm h-100">
@@ -19,10 +18,10 @@ const RecursoHidricoCard = ({ recurso }) => (
     </div>
 );
 
-// Componente principal da página
 const AddressDashboardPage = () => {
-    const { id } = useParams(); // Pega o 'id' do endereço da URL
-    const navigate = useNavigate(); // Hook para navegação programática
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [address, setAddress] = useState(null);
     const [recursos, setRecursos] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -33,12 +32,19 @@ const AddressDashboardPage = () => {
             setLoading(true);
             setError('');
             try {
-                // 1. Busca os detalhes do endereço específico
+                // 1. Busca os detalhes do endereço
                 const addressResponse = await api.get(`/addresses/${id}/`);
                 setAddress(addressResponse.data);
 
-                // 2. Busca os recursos hídricos associados a esse endereço
-                const recursosResponse = await api.get(`/recursos-hidricos/?endereco=${id}`);
+                // 2. Busca os recursos hídricos com base no endereço e no termo de pesquisa
+                const search = searchParams.get('search');
+                const params = new URLSearchParams();
+                params.set('endereco', id);
+                if (search) {
+                    params.set('search', search);
+                }
+
+                const recursosResponse = await api.get(`/recursos-hidricos/?${params.toString()}`);
                 setRecursos(recursosResponse.data);
 
             } catch (err) {
@@ -50,7 +56,7 @@ const AddressDashboardPage = () => {
         };
 
         fetchAddressDetails();
-    }, [id]); // Executa sempre que o 'id' na URL mudar
+    }, [id, searchParams]);
 
     if (loading) {
         return <div className="text-center">Carregando detalhes do endereço...</div>;
@@ -84,7 +90,6 @@ const AddressDashboardPage = () => {
                         {`${address.rua}, ${address.numero}, ${address.bairro}, ${address.municipio} - ${address.estado}`}
                     </p>
                 </div>
-                {/* BOTÃO VOLTAR PADRONIZADO */}
                 <button onClick={() => navigate(-1)} className="btn btn-sm btn-outline-secondary">
                     <ArrowLeft size={16} className="me-2" />
                     Voltar
@@ -95,7 +100,6 @@ const AddressDashboardPage = () => {
 
             <div className="d-flex justify-content-between align-items-center my-4">
                 <h2 className="h4">Recursos Hídricos</h2>
-                {/* BOTÃO ADICIONAR RECURSO PADRONIZADO */}
                 <button className="btn btn-sm btn-primary">
                     <PlusCircle size={20} className="me-2" />
                     Adicionar Recurso
@@ -110,7 +114,7 @@ const AddressDashboardPage = () => {
                 </div>
             ) : (
                 <div className="text-center p-5 bg-light rounded">
-                    <p>Nenhum recurso hídrico encontrado para este endereço.</p>
+                    <p>Nenhum recurso hídrico encontrado para este endereço ou filtro.</p>
                 </div>
             )}
         </div>

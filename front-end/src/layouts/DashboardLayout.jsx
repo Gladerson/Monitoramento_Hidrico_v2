@@ -1,12 +1,11 @@
 // src/layouts/DashboardLayout.jsx
-import React from 'react';
-import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { Outlet, useNavigate, Link, useLocation, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSessionTimer } from '../hooks/useSessionTimer';
 import { House, SignOut, MagnifyingGlass, Drop, Waves, Factory, Broadcast } from '@phosphor-icons/react';
 import logo from '../assets/WaterStatios.PNG';
 
-// Helper function to format time
 const formatTime = (ms) => {
     const totalSeconds = Math.floor(ms / 1000);
     const minutes = Math.floor(totalSeconds / 60);
@@ -20,13 +19,11 @@ const Sidebar = () => {
     const navigate = useNavigate();
     const location = useLocation();
 
-    // *** CORREÇÃO: A função handleLogout foi adicionada de volta. ***
     const handleLogout = () => {
         logout();
         navigate('/login');
     };
 
-    // Helper function para determinar a classe do link
     const getLinkClass = (path, tipo = null) => {
         const searchParams = new URLSearchParams(location.search);
         const currentTipo = searchParams.get('tipo');
@@ -82,7 +79,6 @@ const Sidebar = () => {
                 <small className="d-block text-white-50 mt-2">
                     {user?.email !== 'ti.semarh@gmail.com' && `Sessão expira em: ${formatTime(timeLeft)}`}
                 </small>
-                {/* Este botão depende da função handleLogout */}
                 <button className="btn btn-outline-light mt-3 w-100" onClick={handleLogout}>
                     <SignOut size={16} className="me-2" /> Sair
                 </button>
@@ -91,15 +87,44 @@ const Sidebar = () => {
     );
 };
 
+const SearchBar = () => {
+    const [searchParams, setSearchParams] = useSearchParams();
+    const [searchTerm, setSearchTerm] = useState(searchParams.get('search') || '');
+    const navigate = useNavigate();
+    const location = useLocation();
 
-const SearchBar = () => (
-    <div className="input-group mb-4 shadow-sm">
-        <input type="text" className="form-control" placeholder="Digite para pesquisar..." />
-        <button className="btn btn-primary" type="button" style={{borderColor: '#ced4da'}}>
-            <MagnifyingGlass size={20} />
-        </button>
-    </div>
-);
+    const handleSearch = () => {
+        const params = new URLSearchParams(searchParams);
+        if (searchTerm.trim()) {
+            params.set('search', searchTerm.trim());
+        } else {
+            params.delete('search');
+        }
+        navigate(`${location.pathname}?${params.toString()}`);
+    };
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    return (
+        <div className="input-group mb-4 shadow-sm">
+            <input
+                type="text"
+                className="form-control"
+                placeholder="Digite para pesquisar..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyPress={handleKeyPress}
+            />
+            <button className="btn btn-primary" type="button" onClick={handleSearch} style={{borderColor: '#ced4da'}}>
+                <MagnifyingGlass size={20} />
+            </button>
+        </div>
+    );
+};
 
 const DashboardLayout = () => {
     return (

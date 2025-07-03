@@ -41,14 +41,20 @@ export const useSessionTimer = () => {
             });
         }, 1000);
 
-        // Eventos para resetar o timer
-        const events = ['mousemove', 'mousedown', 'keypress', 'scroll', 'touchstart'];
-        events.forEach(event => window.addEventListener(event, resetTimer));
+        // Adiciona um listener para cliques em links para resetar o timer.
+        const handleLinkClick = (event) => {
+            if (event.target.closest('a')) {
+                resetTimer();
+            }
+        };
+        
+        // Usar 'mousedown' é uma boa prática para capturar o clique antes da navegação.
+        window.addEventListener('mousedown', handleLinkClick);
 
-        // Limpeza
+        // Limpeza: remove os listeners quando o componente é desmontado.
         return () => {
             clearInterval(countdownInterval);
-            events.forEach(event => window.removeEventListener(event, resetTimer));
+            window.removeEventListener('mousedown', handleLinkClick);
         };
 
     }, [user, resetTimer, handleLogout]);

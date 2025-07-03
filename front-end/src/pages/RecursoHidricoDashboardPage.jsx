@@ -1,6 +1,6 @@
 // src/pages/RecursoHidricoDashboardPage.jsx
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useSearchParams } from 'react-router-dom';
 import api from '../services/api';
 import { Drop, Radio, CaretRight } from '@phosphor-icons/react';
 
@@ -19,13 +19,23 @@ const DeviceCard = ({ device }) => (
 const RecursoHidricoDashboardPage = () => {
     const { recursoId } = useParams();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
     const [recurso, setRecurso] = useState(null);
     const [dispositivos, setDispositivos] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        setLoading(true);
+        
         const fetchRecursoDetails = api.get(`/recursos-hidricos/${recursoId}/`);
-        const fetchDispositivos = api.get(`/dispositivos/?local=${recursoId}`);
+        
+        const search = searchParams.get('search');
+        const params = new URLSearchParams();
+        params.set('local', recursoId);
+        if (search) {
+            params.set('search', search);
+        }
+        const fetchDispositivos = api.get(`/dispositivos/?${params.toString()}`);
 
         Promise.all([fetchRecursoDetails, fetchDispositivos])
             .then(([recursoRes, dispositivosRes]) => {
@@ -38,7 +48,7 @@ const RecursoHidricoDashboardPage = () => {
             .finally(() => {
                 setLoading(false);
             });
-    }, [recursoId]);
+    }, [recursoId, searchParams]);
 
     if (loading) return <div className="text-center">Carregando...</div>;
     if (!recurso) return <div className="text-center">Recurso Hídrico não encontrado.</div>;
@@ -62,7 +72,7 @@ const RecursoHidricoDashboardPage = () => {
                         {dispositivos.map(device => <DeviceCard key={device.mac_address} device={device} />)}
                     </div>
                 ) : (
-                    <p className="text-muted">Nenhum dispositivo sensor cadastrado neste recurso.</p>
+                    <p className="text-muted">Nenhum dispositivo sensor cadastrado neste recurso ou encontrado na busca.</p>
                 )}
             </div>
         </div>
